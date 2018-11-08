@@ -1,39 +1,60 @@
-var tile;
-var image;
-var timer;
+
+var puzzletile;
+var puzzle;
+var images;
 var empty = '300px';
-var freeSpace1 = '300px';
-var sessionStart = false;
+var spaceout = '300px';
+var img= "url('wolf.jpg')";
 
 window.onload = function ()
 {
-    setTiles();
-    shuffle();
     
-
+    setPuzzleTiles();
+    shuffle();
+    newImg();
+    
 };
 
+/*Multiple Background Images*/
+function newImg(){
+  var area = document.getElementById("controls");
+  var i=0;
+  var btn = document.createElement("BUTTON");
+  var p = document.createTextNode("Next Image");
+  btn.appendChild(p);
+  area.appendChild(btn);
+  images= ["url('eye.jpg')","url('nature.jpg')","url('goku.jpg')","url('wolf.jpg')"];
+  btn.onclick= function(){
+   img= images[i];
+   i++;
+   if(i>3){
+    i=0;
+   }
+   setPuzzleTiles();
 
+  }
+}
 
-function setTiles(){
-    var puzzle = document.getElementById('puzzlearea');
-    
-    tile = puzzle.getElementsByTagName('div');
+/*Set Puzzle Tiles */ 
+function setPuzzleTiles(){
+    puzzle = document.getElementById('puzzlearea');
+    puzzletile = puzzle.getElementsByTagName('div');
 
-    for (var i=0; i<tile.length; i++)
+    for (var i=0; i<puzzletile.length; i++)
     {
-        tile[i].style.backgroundImage="url('wolf.jpg')";
-        tile[i].style.backgroundSize ="400px 400px";        
-        tile[i].className = 'puzzlepiece';
-        tile[i].style.left = (i%4*100)+'px';
-        tile[i].style.top = (parseInt(i/4)*100) + 'px';
-        tile[i].webkitTransition = "all 1000ms ease";
-        tile[i].mozTransition = "all 1000ms ease";
-        tile[i].msTransition = "all 1000ms ease";
-        tile[i].oTransition = "all 1000ms ease";
-        tile[i].style.transition = "all 1000ms ease";
-        tile[i].style.backgroundPosition= '-' + tile[i].style.left + ' ' + '-' + tile[i].style.top;
-        tile[i].onmouseover = function()
+        puzzletile[i].style.backgroundImage=img;
+        puzzletile[i].style.backgroundSize ="400px 400px";        
+        puzzletile[i].className = 'puzzlepiece';
+        puzzletile[i].style.color="white"
+        puzzletile[i].style.left = (i%4*100)+'px';
+        puzzletile[i].style.top = (parseInt(i/4)*100) + 'px';
+        puzzletile[i].webkitTransition = "all 1000ms ease";
+        puzzletile[i].mozTransition = "all 1000ms ease";
+        puzzletile[i].msTransition = "all 1000ms ease";
+        puzzletile[i].oTransition = "all 1000ms ease";
+        puzzletile[i].style.transition = "all 1000ms ease";
+        puzzletile[i].style.backgroundPosition= '-' + puzzletile[i].style.left + ' ' + '-' + puzzletile[i].style.top;
+        puzzletile[i].onmouseover = function()
         {
             if (move(parseInt(this.innerHTML)))
             {
@@ -41,20 +62,20 @@ function setTiles(){
                 this.style.color = "#006600";
             }
         };
-        tile[i].onmouseout = function()
+        puzzletile[i].onmouseout = function()
         {
             this.style.border = "2px solid black";
             this.style.color = "#000000";
         };
 
-        tile[i].onclick = function()
+        puzzletile[i].onclick = function()
         {
             if (move(parseInt(this.innerHTML)))
             {
                 swap(this.innerHTML-1);
                 if (finish())
                 {
-                    Gamewin();
+                    youWin();
                 }
                 return;
             }
@@ -62,13 +83,8 @@ function setTiles(){
     }
 }
 
-function newImage(){
-    var newImage = document.getElementById('newimg');
-    newImage.onclick = function()
-    {
-        
-    }
-}
+
+/* Shuffle Puzzle Tiles */
 function shuffle(){
     var shuffle = document.getElementById('shufflebutton');
     shuffle.onclick = function()
@@ -79,7 +95,7 @@ function shuffle(){
             var rand = parseInt(Math.random()* 100) %4;
             if (rand == 0)
             {
-                var mve = mveUp(empty, freeSpace1);
+                var mve = mveUp(empty,spaceout);
                 if ( mve != -1)
                 {
                     swap(mve);
@@ -87,7 +103,7 @@ function shuffle(){
             }
             if (rand == 1)
             {
-                var mve = mveDown(empty, freeSpace1);
+                var mve = mveDown(empty, spaceout);
                 if ( mve != -1) 
                 {
                     swap(mve);
@@ -96,7 +112,7 @@ function shuffle(){
 
             if (rand == 2)
             {
-                var mve = mveLeft(empty, freeSpace1);
+                var mve = mveLeft(empty, spaceout);
                 if ( mve != -1)
                 {
                     swap(mve);
@@ -105,7 +121,7 @@ function shuffle(){
 
             if (rand == 3)
             {
-                var mve = mveRight(empty, freeSpace1);
+                var mve = mveRight(empty, spaceout);
                 if (mve != -1)
                 {
                     swap(mve);
@@ -115,44 +131,47 @@ function shuffle(){
     };
 }
 
+/*Function to Move Tiles */
 function move(pos)
 {
-    if (mveLeft(empty, freeSpace1) == (pos-1))
+    if (mveLeft(empty, spaceout) == (pos-1))
     {
         return true;
     }
 
-    if (mveDown(empty, freeSpace1) == (pos-1))
+    if (mveDown(empty, spaceout) == (pos-1))
     {
         return true;
     }
 
-    if (mveUp(empty, freeSpace1) == (pos-1))
+    if (mveUp(empty, spaceout) == (pos-1))
     {
         return true;
     }
 
-    if (mveRight(empty, freeSpace1) == (pos-1))
+    if (mveRight(empty, spaceout) == (pos-1))
     {
         return true;
     }
 }
 
-function Gamewin()
+
+/*Alert when you complete the puzzle */
+function youWin()
 {
     var body = document.getElementsByTagName('body');
-    body[0].style.background = "#FF0000";
-    image = 10;
-    timer = setTimeout(win, 100);
-    var newtimer = setTimeout(reload, 2000);
+    body[0].style.backgroundColor = "#0000FF";
+    //body[0].style.backgroundImage = "url('winner.jpg')";
+    alert('CONGRATULATIONS,YOU WON!!!!');
 }
 
+/*Function that test when you have completed the puzzle */
 function finish()
 {
     var flag = true;
-    for (var i = 0; i < tile.length; i++) {
-        var y = parseInt(tile[i].style.top);
-        var x = parseInt(tile[i].style.left);
+    for (var i = 0; i < puzzletile.length; i++) {
+        var y = parseInt(puzzletile[i].style.top);
+        var x = parseInt(puzzletile[i].style.left);
 
         if (x != (i%4*100) || y != parseInt(i/4)*100)
         {
@@ -163,23 +182,25 @@ function finish()
     return flag;
 }
 
+/* Function the controls the puzzle swaps */
 function swap (pos) {
-    var temp = tile[pos].style.top;
-    tile[pos].style.top = freeSpace1;
-    freeSpace1 = temp;
+    var temp = puzzletile[pos].style.top;
+    puzzletile[pos].style.top = spaceout;
+    spaceout = temp;
 
-    temp = tile[pos].style.left;
-    tile[pos].style.left = empty;
+    temp = puzzletile[pos].style.left;
+    puzzletile[pos].style.left = empty;
     empty = temp;
 }
 
+/* Function to control movement of tiles to the right */
 function mveRight (x, y) {
     var xx = parseInt(x);
     var yy = parseInt(y);
     if (xx < 300)
     {
-        for (var i =0; i<tile.length; i++){
-            if (parseInt(tile[i].style.left) - 100 == xx && parseInt(tile[i].style.top) == yy) 
+        for (var i =0; i<puzzletile.length; i++){
+            if (parseInt(puzzletile[i].style.left) - 100 == xx && parseInt(puzzletile[i].style.top) == yy) 
             {
                 return i;
             }
@@ -190,6 +211,8 @@ function mveRight (x, y) {
         return -1;
     } 
 }
+
+/* Function to control movement of tiles to the left */
 function mveLeft(x, y)
 {
     var xx = parseInt(x);
@@ -197,9 +220,9 @@ function mveLeft(x, y)
 
     if (xx > 0)
     {
-        for (var i = 0; i < tile.length; i++) 
+        for (var i = 0; i < puzzletile.length; i++) 
         {
-            if (parseInt(tile[i].style.left) + 100 == xx && parseInt(tile[i].style.top) == yy)
+            if (parseInt(puzzletile[i].style.left) + 100 == xx && parseInt(puzzletile[i].style.top) == yy)
             {
                 return i;
             } 
@@ -211,16 +234,16 @@ function mveLeft(x, y)
     }
 }
 
-
+/* Function to control downward movement of tiles*/
 function mveDown (x, y)
 {
     var xx = parseInt(x);
     var yy = parseInt(y);
     if (yy < 300)
     {
-        for (var i=0; i<tile.length; i++)
+        for (var i=0; i<puzzletile.length; i++)
         {
-            if (parseInt(tile[i].style.top) - 100 == yy && parseInt(tile[i].style.left) == xx) 
+            if (parseInt(puzzletile[i].style.top) - 100 == yy && parseInt(puzzletile[i].style.left) == xx) 
             {
                 return i;
             }
@@ -232,14 +255,15 @@ function mveDown (x, y)
     } 
 }
 
+/* Function to control upward movement of tiles */
 function mveUp (x, y) {
     var xx = parseInt(x);
     var yy = parseInt(y);
     if (yy > 0)
     {
-        for (var i=0; i<tile.length; i++)
+        for (var i=0; i<puzzletile.length; i++)
         {
-            if (parseInt(tile[i].style.top) + 100 == yy && parseInt(tile[i].style.left) == xx) 
+            if (parseInt(puzzletile[i].style.top) + 100 == yy && parseInt(puzzletile[i].style.left) == xx) 
             {
                 return i;
             }
